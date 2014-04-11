@@ -79,20 +79,24 @@ for(i in 1:length(allgirls))
 		}
 		else
 		{
-			name[j]<-0
+			name[j]<-NA
 		}
 	}
 	newname<- 1-name
 	girlranks[,i]<-newname
 }
-sums<-colSums(girlranks,na.rm=T)
+temp<-girlranks
+temp[is.na(temp)]<-0
+sums<-colSums(temp)
 girltop50<-names(sums[rev(order(sums))][2:51])
+girltop5000<-names(sums[rev(order(sums))][2:5001])
 
 girlranks.sort<-girlranks[,rev(order(sums))][2:length(girlranks[1,])]
 
 write.table(girlranks.sort,"data/girlranks.txt",sep='\t',col.names=NA)
 rownames(girlranks.sort)<-girlranks.sort[,1]
-write.table(girlranks.sort[,colnames(girlranks.sort) %in% girltop50],"data/girlranks_top50.txt",sep='\t',row.names=T,col.names=NA)
+write.table(girlranks.sort[,1:51],"data/girlranks_top50.txt",sep='\t',row.names=T,col.names=NA)
+write.table(girlranks.sort[,1:5001],"data/girlranks_top5000.txt",sep='\t',row.names=T,col.names=NA)
 
 allboys<-unique(unlist(boytable))
 boyranks<-data.frame(matrix(ncol=length(allboys),nrow=length(yrs)))
@@ -110,7 +114,7 @@ for(i in 1:length(allboys))
 		}
 		else
 		{
-			name[j]<-0
+			name[j]<-NA
 		}
 	}
 	newname<- 1-name
@@ -121,32 +125,18 @@ rownames(boyranks)<-boyranks[,1]
 
 sums<-colSums(boyranks,na.rm=T)
 boytop50<-names(sums[rev(order(sums))][2:51])
+boytop5000<-names(sums[rev(order(sums))][2:5001])
 
 boyranks.sort<-boyranks[,rev(order(sums))][2:length(boyranks[1,])]
 write.table(boyranks.sort,"data/boyranks.txt",sep='\t',col.names=NA)
-write.table(boyranks.sort[,colnames(boyranks.sort) %in% boytop50],"data/boyranks_top50.txt",sep='\t',row.names=T,col.names=NA)
+write.table(boyranks.sort[,1:51],"data/boyranks_top50.txt",sep='\t',row.names=T,col.names=NA)
+write.table(boyranks.sort[,1:5001],"data/boyranks_top5000.txt",sep='\t',row.names=T,col.names=NA)
 
 #correlation matrix of girl names?
 source("U:/mcm/R/utilities/corplot.R")
 cors<-corplotd(girlranks[,colnames(girlranks) %in% girltop50])
 h<-heatmap(cors)
 corplotd(girlranks[,colnames(girlranks) %in% girltop50][h$rowInd,h$colInd])
-
-#line plots of names over time
-#tbl<-girltable
-ranktable<-girlranks
-par(mfrow=c(1,3))
-nameofinterest<-c("Madelaine","Madeline","Madelyn");
-par(mfrow=c(3,3))
-for(i in 1:length(nameofinterest))
-{
-	plot(ranktable[,colnames(ranktable) %in% nameofinterest[i]],axes=F,ylab="Relative Name Rank",xlab="Year",main=nameofinterest[i],ylim=c(0,1),type='l')
-	axis(side=1,at=seq(from=1,to=length(yrs),by=20),labels=rownames(ranktable)[seq(from=1,to=length(yrs),by=20)])
-	axis(side=2,at=seq(from=0,to=1,by=.1),labels=seq(from=0,to=1,by=.1))
-}
-
-
-barplot(t(tail(ranktable[,c("Mary","Anna")],20)),beside=T,ylim=c(.99,1),xpd=F)
 
 sessionInfo()
 
