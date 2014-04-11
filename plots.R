@@ -150,9 +150,6 @@ plot(x,y,main="x vs. y", xlab="x label", ylab="y label", col="red")
 #this first file has each year, the number of unique girl and boy names listed for each year, and the number that start and end with each letter each year.
 yeardf<-read.table("data/yeardf.txt",sep='\t',as.is=T,header=T)
 
-#this file has each name as a column, and the position of the name within the column as a percentile - so names near the top of the list for a given year have a very high rank, less popular a lower rank.
-girlranks<-read.table("data/girlranks.txt",sep='\t',as.is=T,header=T)
-#boyranks<-read.table("data/boyranks.txt",sep='\t',as.is=T,header=T)
 
 ################################################
 # 9. what's going on with this data set?
@@ -180,21 +177,19 @@ yeardf[1:5,1:5]
 plot(yeardf$year,yeardf$num.g.names)
 
 # turn into a line plot
-plot(yeardf$year,yeardf$num.g.names,type='l',col='red')
-#add a line to an existing plot with lines()
+plot(yeardf$year,yeardf$num.g.names,type='l',col='red',main="Number of Unique Names",xlab="Year",ylab="Number of Unique Names")
+#add a line to an existing plot with lines() - add the number of boy names over time
 lines(yeardf$year,yeardf$num.b.names,type='l',col='blue')
 
 plot(yeardf$year,yeardf$num.g.names)
 #add points to an existing plot with points() - color points after 2007 blue
 points(yeardf$year[yeardf$year > 2007],yeardf$num.g.names[yeardf$year > 2007],col='blue')
 
-# exercise 6 - what has happened to boy's names ending with n over the years?
+# exercise 10 - what the heck is happening with boy's names ending with n? look at column b.end.n.
 
 ###############################################
 # 11. multifigure plots using par and mfrow
 ###############################################
-
-barplot(as.vector(t(yeardf[133,4:29][order.iv])),horiz=T,las=2,names.arg=letters[order.iv],main="Girl names first letters, 2012")
 
 par(mfrow=c(5,6),mar=c(1,1,1.5,1))
 for(i in 4:29)
@@ -202,13 +197,24 @@ for(i in 4:29)
 	plot(yeardf[,i]/yeardf[,2],type='l',main=colnames(yeardf)[i],xaxt='n',yaxt='n',ylab='',xlab='')
 }
 
+#read in one more data set - this one is big and will take awhile.
 
-namesofinterest<-c("Madelaine","Madeline","Madelyn")
-par(mfrow=c(1,3))
+#this file has each name as a column, and the position of the name within the column as a percentile - so names near the top of the list for a given year have a very high rank, less popular a lower rank.
+girlranks_top5000<-read.table("data/girlranks_top5000.txt",sep='\t',as.is=T,header=T,row.names=1)
+#boyranks_top5000<-read.table("data/boyranks_top5000.txt",sep='\t',as.is=T,header=T,row.names=1)
+
+#if you want to look at the FULL list, uncomment these
+#girlranks<-read.table("data/girlranks.txt",sep='\t',as.is=T,header=T,row.names=1)
+#boyranks<-read.table("data/boyranks.txt",sep='\t',as.is=T,header=T,row.names=1)
+
+namesofinterest<-c("Velma","Daphne")
+par(mfrow=c(1,2))
 for(i in 1:length(namesofinterest))
 {
-	plot(girlranks[,1],girlranks[,colnames(girlranks) %in% namesofinterest[i]],main=namesofinterest[i],ylim=c(0,1),type='l',ylab="percentile",xlab="year")
+	plot(girlranks_top5000[,1],girlranks_top5000[,colnames(girlranks_top5000) %in% namesofinterest[i]],main=namesofinterest[i],ylim=c(0,1),type='l',ylab="percentile",xlab="year")
 }
+
+#exercise 11 - make some plots with your own list of interesting names, your family, etc. If you want to look at boys names, uncomment the line above.
 
 ################################################
 # 12. adding a legend
@@ -217,14 +223,16 @@ for(i in 1:length(namesofinterest))
 #add a legend to a plot
 plot(yeardf$year,yeardf$num.g.names,type='l',col='red')
 lines(yeardf$year,yeardf$num.b.names,type='l',col='blue')
+
+#you can use this handy shortcut syntax "topleft/bottomright" or just give it an explicit position
 legend("topleft",legend=c("girl names","boy names"),col=c("red","blue"),lty=1)
 
-#kind of a dumb example, but if you were using dots instead, you would do it this way.
+#kind of a dumb example, but if you want dots instead, you would do it this way.
 plot(yeardf$year,yeardf$num.g.names,col='red')
 points(yeardf$year,yeardf$num.b.names,col='blue')
 legend("topleft",legend=c("girl names","boy names"),col=c("red","blue"),pch=1)
 
-# exercise 7 - how would you shrink the legend text size?
+# exercise 7 - figure out how to shrink the legend text size.
 
 ################################################
 # 13. Histogram
@@ -232,7 +240,15 @@ legend("topleft",legend=c("girl names","boy names"),col=c("red","blue"),pch=1)
 
 # a histogram is a representation of the distribution of data. It shows bars whose area is equal to the frequency of observations in a given interval.
 
-#figure out a sensible histogram to make
+recent_change<-girlranks_top5000["2012",]-girlranks_top5000["2011",]
+
+#just for curiosity, what names increased a lot from 2011 to 2012
+recent_change[rev(order(recent_change,na.last=NA))][1:100]
+
+hist(as.vector(recent_change))
+
+# histogram of recently changing names?
+
 
 ################################################
 # 14. Barplot
@@ -281,7 +297,7 @@ display.brewer.all()
 gr50<-read.table("data/girlranks_top50.txt",sep='\t',as.is=T,header=T,row.names=1)
 heatmap(as.matrix(gr50))
 
-#make the colors less sucky
+#make the colors a little better 
 heatmap(as.matrix(gr50),col=brewer.pal(9,"Blues"))
 
 #for more advanced heatmapping, use pheatmap package or roll your own with image() ala https://github.com/mmarchin/Rutils/blob/master/mcm_image.R
@@ -290,7 +306,7 @@ heatmap(as.matrix(gr50),col=brewer.pal(9,"Blues"))
 # 18. Saving graphics
 ###############################################
 
-#save to a pdf with pdf()
+#save to a pdf with pdf() - any plots done between pdf() and dev.off() will be pages in pdf
 pdf("heatmap.pdf")
 heatmap(as.matrix(gr50),col=brewer.pal(9,"Blues"),cexRow=.4)
 dev.off()
@@ -306,11 +322,7 @@ dev.off()
 
 #https://github.com/mmarchin/introR
 
-#http://www.staff.ncl.ac.uk/staff/stephen.juggins/data/Iowa2007/PlottingTips.pdf
-
 #coursera courses
-
-#Yep, it is.
 
 ###############################################
 # extra stuff that I wanted to do for fun
@@ -334,3 +346,92 @@ lines(djia$year,djia$VALUE,col='blue')
 lines(pop$year,pop$nat_pop/20000,col='darkgreen')
 abline(v=2007,lty=2,col='gray')
 legend("topleft",legend=c("unique girl names","dow jones","pop growth"),col=c("black","blue","darkgreen"),lty=1)
+
+#kmeans of girl first letters?
+temp<-yeardf[,4:29]/yeardf[,2]
+kmc<-kmeans(t(temp),centers=8)
+par(mfrow=c(2,4),oma=c(3,3,3,3))
+cols<-c(brewer.pal(8,"Dark2"),brewer.pal(9,"Set1"))
+for(i in 1:8)
+{
+	if(length(which(kmc$cluster==i))>1)
+	{
+		plot(temp[,kmc$cluster==i][,1],type='n',main=paste(gsub("g.start.","",names(kmc$cluster)[kmc$cluster==i]),collapse=','),ylim=c(0,.2))
+		for(j in 1:length(which(kmc$cluster==i)))
+		{
+			lines(temp[,kmc$cluster==i][,j],type='l',col=cols[j])
+		}
+		legend("topleft",gsub("g.start.","",names(kmc$cluster)[kmc$cluster==i]),lty=1,col=cols)
+	}else
+	{
+		plot(temp[,kmc$cluster==i],type='l',col=cols[i],main=paste(gsub("g.start.","",names(kmc$cluster)[kmc$cluster==i])),ylim=c(0,.2))
+	}
+}
+mtext("girl first letters",outer=T)
+
+#kmeans of girl last letters?
+temp<-yeardf[,56:81]/yeardf[,2]
+kmc<-kmeans(t(temp),centers=8)
+par(mfrow=c(2,4),oma=c(3,3,3,3))
+cols<-brewer.pal(8,"Dark2")
+for(i in 1:8)
+{
+	if(length(which(kmc$cluster==i))>1)
+	{
+		plot(temp[,kmc$cluster==i][,1],type='n',main=paste(gsub("g.end.","",names(kmc$cluster)[kmc$cluster==i]),collapse=','),ylim=c(0,.5))
+		for(j in 1:length(which(kmc$cluster==i)))
+		{
+			lines(temp[,kmc$cluster==i][,j],type='l',col=cols[j])
+		}
+		legend("topleft",gsub("g.end.","",names(kmc$cluster)[kmc$cluster==i]),lty=1,col=cols)
+	}else
+	{
+		plot(temp[,kmc$cluster==i],type='l',col=cols[1],main=paste(gsub("g.end.","",names(kmc$cluster)[kmc$cluster==i])),ylim=c(0,.5))
+	}
+}
+mtext("girl last letters",outer=T)
+
+#kmeans of boy first letters?
+temp<-yeardf[,30:55]/yeardf[,3]
+kmc<-kmeans(t(temp),centers=8)
+par(mfrow=c(2,4),oma=c(3,3,3,3))
+cols<-brewer.pal(8,"Dark2")
+for(i in 1:8)
+{
+	if(length(which(kmc$cluster==i))>1)
+	{
+		plot(temp[,kmc$cluster==i][,1],type='n',main=paste(gsub("b.start.","",names(kmc$cluster)[kmc$cluster==i]),collapse=','),ylim=c(0,.2))
+		for(j in 1:length(which(kmc$cluster==i)))
+		{
+			lines(temp[,kmc$cluster==i][,j],type='l',col=cols[j])
+		}
+		legend("topleft",gsub("b.start.","",names(kmc$cluster)[kmc$cluster==i]),lty=1,col=cols)
+	}else
+	{
+		plot(temp[,kmc$cluster==i],type='l',col=cols[1],main=paste(gsub("b.start.","",names(kmc$cluster)[kmc$cluster==i])),ylim=c(0,.2))
+	}
+}
+mtext("boy first letters",outer=T)
+
+#kmeans of boy last letters?
+temp<-yeardf[,82:107]/yeardf[,3]
+kmc<-kmeans(t(temp),centers=8)
+par(mfrow=c(2,4),oma=c(3,3,3,3))
+cols<-brewer.pal(8,"Dark2")
+for(i in 1:8)
+{
+	if(length(which(kmc$cluster==i))>1)
+	{
+		plot(temp[,kmc$cluster==i][,1],type='n',main=paste(gsub("b.end.","",names(kmc$cluster)[kmc$cluster==i]),collapse=','),ylim=c(0,.5))
+		for(j in 1:length(which(kmc$cluster==i)))
+		{
+			lines(temp[,kmc$cluster==i][,j],type='l',col=cols[j])
+		}
+		legend("topleft",gsub("b.end.","",names(kmc$cluster)[kmc$cluster==i]),lty=1,col=cols)
+	}else
+	{
+		plot(temp[,kmc$cluster==i],type='l',col=cols[1],main=paste(gsub("b.end.","",names(kmc$cluster)[kmc$cluster==i])),ylim=c(0,.5))
+	}
+}
+mtext("boy last letters",outer=T)
+
