@@ -2,7 +2,7 @@
 # 1. Getting Started
 ################################
 
-# go to http://goo.gl/Qhs3PR with a web browser and download data folder and plots.R.
+# go to http://goo.gl/Qhs3PR with a web browser and download tutorial.zip and unzip. 
 # or 
 # https://github.com/mmarchin/introRgraphics
 # command line: git clone git@github.com:mmarchin/introRgraphics.git
@@ -355,7 +355,7 @@ heatmap(as.matrix(gr50))
 #make the colors a little better 
 heatmap(as.matrix(gr50),col=brewer.pal(9,"Blues"))
 
-#for more advanced heatmapping, use pheatmap package or roll your own with image() ala https://github.com/mmarchin/Rutils/blob/master/mcm_image.R
+#for more advanced heatmapping or adding a color scale, use pheatmap package or roll your own with layout() and image() ala https://github.com/mmarchin/Rutils/blob/master/mcm_image.R
 
 ###############################################
 # 19. Saving graphics
@@ -371,13 +371,19 @@ png("heatmap.png",height=1600,width=1600,pointsize=16)
 heatmap(as.matrix(gr50),col=brewer.pal(9,"Blues"))
 dev.off()
 
+#exercise 19 - copy a plot from somewhere above down here and save it to a file.
+
 ##############################################
-# HELP! R is haRd
+# Links
 ##############################################
 
-#https://github.com/mmarchin/introR
+#https://github.com/mmarchin/introR - A longer version of an intro class I've done
 
-#coursera courses
+#http://tutorialr.com - This site is an early attempt to wade through R learning resources
+
+#http://www.rdocumentation.org - A new site for searching all R documentation, exploring what's available
+
+#coursera courses - https://www.coursera.org/course/compdata
 
 ###############################################
 # extra stuff that I just wanted to do for fun
